@@ -1,8 +1,6 @@
 
 # PyFixedFlatFile
 
-[![N|Solid](https://cldup.com/dTxpPi9lDf.thumb.png)](https://nodesource.com/products/nsolid)
-
 É uma biblioteca python que tem como objetivo facilitar a criação de arquivo de texto do tipo chamado `flat file` com dados de tamanho fixo. 
 Em vários ambientes corporativos, empresas trocam dados através de arquivos de textos que obedecem uma determinada estrutura, uma determinada especificação acordada entre elas.
 
