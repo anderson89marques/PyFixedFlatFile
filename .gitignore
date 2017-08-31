@@ -1,0 +1,6 @@
+.cache
+.pyFixedFlatFileEnv
+.vscode
+__pycache__
+teste_core.py
+teste_relatorio_confaz.py
