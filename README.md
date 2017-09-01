@@ -17,6 +17,7 @@ O arquivo vai ser referente a informações de um empresa fictícia chamada Anjo
 No arquivo cada resgistro (linha) deve possuir um identificador com tamanho dois, afim de identificar quais são os dados que aquele registro possui.
 
 O resgistro que começar com 10, vai ter as seguintes informações:
+
 | Nome   | Tamanho | tipo | 
 | ------ | ------  | ---- |
 | id                | 2       | n (Númerico) |
@@ -27,6 +28,7 @@ O resgistro que começar com 10, vai ter as seguintes informações:
 |data criação       | 8       | a (Alfa-númerico) |
 
 O registro que começar com 11, vai ter as informações:
+
 | Nome   | Tamanho | tipo | 
 | ------ | ------  | ---- |
 | id                 | 2       | n (Númerico) |
