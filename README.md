@@ -4,6 +4,12 @@
 É uma biblioteca python que tem como objetivo facilitar a criação de arquivo de texto do tipo chamado `flat file` com dados de tamanho fixo. 
 Em vários ambientes corporativos, empresas trocam dados através de arquivos de textos que obedecem uma determinada estrutura, uma determinada especificação acordada entre elas.
 
+## Instalação
+
+``` 
+pip install pyFixedFlatFile
+```
+
 ## Como usar?
 Nessa seção uma especificação exemplo de como o conteúdo do arquivo deve ser estruturado e na sequência como usar o PyFixedFlatFile(Py3F :D) para gerar o arquivo desejado.
 #### Especificação
