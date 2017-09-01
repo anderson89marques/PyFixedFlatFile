@@ -68,10 +68,8 @@ for registro in registros:
     s += builder.generate(registro) + "\n"
 """
 
-from steps import Step
+from pyFixedFlatFile.steps import Step
 
-# TODO escrever Readme
-# TODO escrever docstrings
 class PyFixedFlatFile:
     def __init__(self, *args, **kwargs):
         self.__step = Step()
@@ -85,8 +83,6 @@ class PyFixedFlatFile:
         """return steps from specs definition"""
         return self.step.steps
 
-    # TODO default
-    # TODO escrever testes em forma de testes unitários
     def fmt(self, spec, registro):
         result = ""
         ident = spec['ident']
@@ -122,21 +118,17 @@ class PyFixedFlatFile:
         self.step.eq(id)
 
     def generate(self, registro):
-        #print("Generate")
         s = ""
         if 'id' in registro and registro['id'] in self.steps:
-            print("ok")
             reg_spec = self.steps[registro['id']]
             for spec in reg_spec:
                 s += self.fmt(spec, registro)
-                print(spec)
         else:
             raise Exception("Id is not in attributes specification!") # melhorar essas mensagens em inglês
         
         return s
 
     def __getattr__(self, class_name):
-        #print("BUILDER __getattr__ {}".format(class_name))
 
         def builder(size, **kwargs):
             """Esse método retorna o próprio objeto

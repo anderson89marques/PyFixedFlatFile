@@ -1,6 +1,6 @@
 from datetime import datetime
 from pyFixedFlatFile import PyFixedFlatFile
-from exceptions import ParamsException
+from pyFixedFlatFile.exceptions import ParamsException
 import pytest
 
 @pytest.fixture

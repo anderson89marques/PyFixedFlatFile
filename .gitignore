@@ -1,4 +1,5 @@
 .cache
+pyFixedFlatFile/__pycache__
 .pyFixedFlatFileEnv
 .vscode
 __pycache__

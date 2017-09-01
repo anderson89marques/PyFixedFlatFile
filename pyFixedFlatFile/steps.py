@@ -1,7 +1,6 @@
 _author_ = "Anderson Marques Morais"
-from exceptions import ParamsException
+from pyFixedFlatFile.exceptions import ParamsException
 
-# TODO escrever docstrings
 class Step:
     def __init__(self, *args, **kwargs):
         self.current_id = None
@@ -26,9 +25,7 @@ class Step:
         if 'fmt' in kwargs and not callable(kwargs['fmt']):
             raise ParamsException("fmt value must be only a callable! Error in {} attribute.".format(kwargs['ident']))    
 
-        #print("nomeclasse builder:  args: %r " % (kwargs))
         specs = {k: v for k, v in kwargs.items()}
-        #specs['ident'] = nome_classe
         specs['size'] = int(size) # preciso colocar isso dentro de um trycexcept
         
         if not self.current_id:
@@ -45,7 +42,6 @@ class Step:
 
         def build(size, **kwargs): 
             """"""
-            #print("nomeclasse: %s, args: %r " % (nome_classe, kwargs))
             specs = {k: v for k, v in kwargs.items()}
             specs['ident'] = nome_classe
             specs['size'] = int(size) # preciso colocar isso dentro de um trycexcept
