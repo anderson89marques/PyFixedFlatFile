@@ -67,6 +67,7 @@ def test_format_method_with_size_only_error(setup_eq):
     spec = {'ident': 'id', 'size': 10}
     with pytest.raises(Exception):
         assert setup_eq.fmt(spec, reg) == '10'
+
 def test_format_method_with_fmt(setup_eq):
     reg = {
         "dataInicial": datetime.now()
