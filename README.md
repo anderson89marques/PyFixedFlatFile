@@ -1,7 +1,7 @@
 
 # PyFixedFlatFile
 
-É uma biblioteca python que tem como objetivo facilitar a criação de arquivo de texto do tipo chamado `flat file` com dados de tamanho fixo. 
+Biblioteca python que facilita a criação de arquivos de texto do tipo `flat file` que possuam dados de tamanho fixo. 
 Em vários ambientes corporativos, empresas trocam dados através de arquivos de textos que obedecem uma determinada estrutura, uma determinada especificação acordada entre elas.
 
 ## Instalação
@@ -11,9 +11,9 @@ pip install pyFixedFlatFile
 ```
 
 ## Como usar?
-Nessa seção uma especificação exemplo de como o conteúdo do arquivo deve ser estruturado e na sequência como usar o PyFixedFlatFile(Py3F :D) para gerar o arquivo desejado.
+O seu uso é simples e como demonstração será usada uma especificação fictícia de exemplo. A especificação definirá como o conteúdo do arquivo deve ser estruturado e na sequência será usado o PyFixedFlatFile(Py3F :D) para gerar o arquivo desejado.
 #### Especificação
-O arquivo vai ser referente a informações de um empresa fictícia chamada AnjosCompany. 
+O arquivo vai ser referente a informações de um empresa fictícia chamada MyCompany. 
 No arquivo cada resgistro (linha) deve possuir um identificador com tamanho dois, afim de identificar quais são os dados que aquele registro possui.
 
 O resgistro que começar com 10, vai ter as seguintes informações:
@@ -166,7 +166,6 @@ with open("fixed_flat_file.txt", "w") as f:
 ```
 O método generate irá retorna uma string formatada de acordo com a específicação representando um registro (uma linha) do arquivo.
 No exemplo, esse retorno é concatenado na variável s, que será salva em um arquivo .txt, que é o `fixed flat file`
-
 
 Meta
 ----
