@@ -1,21 +1,21 @@
 """module to build fixed flat files"""
-from pyFixedFlatFile.steps import Step
+from pyFixedFlatFile.specs import Spec
 
 
 class PyFixedFlatFile:
     """implements the logics to build the flat files"""
 
     def __init__(self, *args, **kwargs):
-        self.__step = Step()
+        self.__spec = Spec()
 
     @property
-    def step(self):
-        return self.__step
+    def spec(self):
+        return self.__spec
 
     @property
-    def steps(self):
+    def data(self):
         """return steps from specs definition"""
-        return self.step.steps
+        return self.spec.data
 
     def fmt(self, spec, registro):
         result = ""
@@ -49,12 +49,12 @@ class PyFixedFlatFile:
 
     def eq(self, id):
         """Setando o identicador da linha"""
-        self.step.eq(id)
+        self.spec.eq(id)
 
     def generate(self, registro):
         s = ""
-        if 'id' in registro and registro['id'] in self.steps:
-            reg_spec = self.steps[registro['id']]
+        if 'id' in registro and registro['id'] in self.data:
+            reg_spec = self.data[registro['id']]
             for spec in reg_spec:
                 s += self.fmt(spec, registro)
         else:
@@ -72,7 +72,7 @@ class PyFixedFlatFile:
         """
         def builder(size, **kwargs):
             keys = {'ident': class_name, **kwargs}
-            self.step.builder(size, **keys)
+            self.spec.builder(size, **keys)
             
             return self 
         return builder

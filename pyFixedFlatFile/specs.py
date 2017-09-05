@@ -2,16 +2,16 @@
 from pyFixedFlatFile.exceptions import ParamsException
 
 
-class Step:
+class Spec:
     """create __steps dict with the data defined in specification"""
 
     def __init__(self, *args, **kwargs):
         self.current_id = None # identifier of the line
-        self.__steps = {}
+        self._spec_data = {}
     
     @property
-    def steps(self):
-        return self.__steps 
+    def data(self):
+        return self._spec_data 
     
     def eq(self, id):
         self.current_id = str(id)
@@ -42,8 +42,8 @@ class Step:
         if not self.current_id:
             raise Exception("Id of line not especified: You must use 'eq' method of PyFixedFlatFile!") 
 
-        if self.current_id not in self.steps:
-            self.steps[self.current_id] = []
-        self.steps[self.current_id].append(specs)
+        if self.current_id not in self.data:
+            self.data[self.current_id] = []
+        self.data[self.current_id].append(specs)
         
         return 
