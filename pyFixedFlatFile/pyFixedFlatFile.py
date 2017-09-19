@@ -25,8 +25,6 @@ class PyFixedFlatFile:
         if ident == 'constant':
             result = str(size) # o valor que está em size é o valor da constante     
         else:
-            if 'default' in spec:
-                resp = spec['default']
             if 'fmt' in spec:
                 resp = spec['fmt'](registro[ident])
             elif ident == 'id':
@@ -36,8 +34,14 @@ class PyFixedFlatFile:
             elif ident == 'filler':
                 resp = ' ' # o campo será preenchido com espaços em branco
             else:
-                resp = registro[ident]
-            
+                if ident in registro:
+                    resp = registro[ident]
+                else:
+                    if 'default' in spec:
+                        resp = spec['default']
+                    else:
+                        raise Exception("attribute {} not specified".format(ident))
+                            
             if 'tp' in spec and spec['tp'] == 'numeric':
                 # Coloca zero(a) a esquerda
                 result = '{:0>{size}}'.format(int(resp), size=size)
