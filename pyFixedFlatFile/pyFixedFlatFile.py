@@ -25,9 +25,10 @@ class PyFixedFlatFile:
         if ident == 'constant':
             result = str(size) # o valor que está em size é o valor da constante     
         else:
+            if 'default' in spec:
+                resp = spec['default']
             if 'fmt' in spec:
                 resp = spec['fmt'](registro[ident])
-            
             elif ident == 'id':
                 resp = registro[ident]
                 if len(resp) != size:
