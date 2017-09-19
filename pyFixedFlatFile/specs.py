@@ -35,7 +35,7 @@ class Spec:
 
         specs = {k: v for k, v in kwargs.items()}
         try:
-            specs['size'] = int(size) # preciso colocar isso dentro de um trycexcept
+            specs['size'] = int(size) if kwargs['ident'] != 'constant' else size # preciso colocar isso dentro de um trycexcept
         except Exception as e:
             raise Exception("size attribute must be int but its value has type {}".format(type(size)))
         
