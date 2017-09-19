@@ -27,8 +27,7 @@ class PyFixedFlatFile:
         else:
             if 'fmt' in spec:
                 resp = spec['fmt'](registro[ident])
-                if len(resp) != size:
-                    raise Exception("The length of value returned by function is not equal the size! Value return ed: {}, size value {}. the size must be {}".format(resp, size, len(resp)))
+            
             elif ident == 'id':
                 resp = registro[ident]
                 if len(resp) != size:
@@ -44,7 +43,9 @@ class PyFixedFlatFile:
             else:
                 # alinha os dados a esquerda e preenche com espaços em branco a direita
                 result = '{:<{size}}'.format(resp, size=size)
-
+            
+            if len(result) != size:
+                    raise Exception("The length of value returned by function is not equal the size! Value return ed: {}, size value {}. the size must be {}".format(resp, size, len(resp)))
         return result
 
     def eq(self, id):
