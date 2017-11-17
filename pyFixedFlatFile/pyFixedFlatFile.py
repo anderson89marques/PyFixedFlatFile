@@ -7,6 +7,7 @@ class PyFixedFlatFile:
 
     def __init__(self, *args, **kwargs):
         self.__spec = Spec()
+        self.nl = '\r\n' if args['NL'] == 'dos' else '\n'
 
     @property
     def spec(self):
@@ -66,6 +67,15 @@ class PyFixedFlatFile:
         else:
             raise Exception("Id is not in attributes specification!") # melhorar essas mensagens em inglês
         
+        return s
+
+    def generate_all(self, registros):
+        s = ""
+        
+        for registro in registros:
+            row_str = self.generate(registro) + "{}".format(self.nl)
+            s += row_str
+
         return s
 
     def __getattr__(self, class_name):
