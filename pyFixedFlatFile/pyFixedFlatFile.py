@@ -7,7 +7,7 @@ class PyFixedFlatFile:
 
     def __init__(self, *args, **kwargs):
         self.__spec = Spec()
-        self.nl = '\r\n' if args['NL'] == 'dos' else '\n'
+        self.nl = '\r\n' if kwargs.get('NL') == 'dos' else '\n'
 
     @property
     def spec(self):
@@ -71,7 +71,6 @@ class PyFixedFlatFile:
 
     def generate_all(self, registros):
         s = ""
-        
         for registro in registros:
             row_str = self.generate(registro) + "{}".format(self.nl)
             s += row_str
