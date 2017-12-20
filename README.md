@@ -1,8 +1,9 @@
 
 # PyFixedFlatFile
-
-Biblioteca python que facilita a criação de arquivos de texto do tipo `flat file` que possuam dados de tamanho fixo. 
-Em vários ambientes corporativos, empresas trocam dados através de arquivos de textos que obedecem uma determinada estrutura, uma determinada especificação acordada entre elas.
+ 
+Em vários ambientes corporativos, empresas trocam dados através de arquivos de textos que obedecem uma determinada estrutura, uma determinada especificação acordada entre elas. Esses arquivos são chamados de arquivos `flat file` 
+com conteúdo de tamanho fixo.
+A biblioteca então facilita a criação desses arquivos do tipo `flat file`.
 
 ## Instalação
 
@@ -11,12 +12,14 @@ pip install pyFixedFlatFile
 ```
 
 ## Como usar?
-O seu uso é simples e como demonstração será usada uma especificação fictícia de exemplo. A especificação definirá como o conteúdo do arquivo deve ser estruturado e na sequência será usado o PyFixedFlatFile(Py3F :D) para gerar o arquivo desejado.
+Como demonstração será usada uma especificação fictícia que definirá como o conteúdo do arquivo deve ser estruturado. 
+Após essa definição geraremos o um arquivo com dados também fictícios que obedecem a especificação..
+
 #### Especificação
 O arquivo vai ser referente a informações de um empresa fictícia chamada MyCompany. 
-No arquivo cada resgistro (linha) deve possuir um identificador com tamanho dois, afim de identificar quais são os dados que aquele registro possui.
+No arquivo cada registro (linha) deve possuir um identificador com tamanho dois(as duas primeiras colunas), afim de identificar quais são os dados que aquele registro possui.
 
-O resgistro que começar com 10, vai ter as seguintes informações:
+O registro que começar com 10, vai ter as seguintes informações:
 
 | Nome   | Tamanho | tipo | 
 | ------ | ------  | ---- |
@@ -44,9 +47,9 @@ O registro que começar com 90, vai ter as seguintes informações:
 | cnpj               | 14      | a (Alfa-númerico) |
 | total registros    | 12      | n (Númerico) |
 
-Agora que foi definido como os dados devem ser representados no arquivo, iremos ver como usar o PyFixedFlatFile para criar o `flat file`.
+Agora que foi definido como os dados devem ser representados no arquivo, iremos ver como descrever essa especificação no pyFixedFlatFile e então gerar o nosso arquivo `flat file`.
 
-#### Usando o PyFixedFlatFile.
+#### Usando o pyFixedFlatFile.
 O código abaixo é como definimos atráves da biblioteca a especificação descrita no sub-seção anterior.
 
 ```python
@@ -56,7 +59,8 @@ from datetime import datetime
 
 builder = PyFixedFlatFile() # instânciando um objeto PyFixedFlatFile 
 
-# Aqui definimos a construção do flat file através do objeto 
+# Aqui definimos a construção do flat file
+# registros que começam com 10
 builder.eq("10") 
 builder.id(2).\
         cnpj(14, fmt=lambda v: "{:>14}".format(v)).\
@@ -64,11 +68,13 @@ builder.id(2).\
         nomeAdm(33).\
         constant('2').\
         dataCriacao(8, fmt=lambda d: format(d, '%d%m%Y'))
+# registros que começam com 11        
 builder.eq(11)
 builder.id(2).\
         logradouro(34).\
         numero(5, tp='numeric').\
         bairro(15)
+# registros que começam com 90        
 builder.eq("90")
 builder.id(2).\
         cnpj(14, fmt=lambda v: "{:>14}".format(v)).\
@@ -76,15 +82,21 @@ builder.id(2).\
         constant('99')
 ```
 
-Primeiro importamos o PyFixedFlatFile, além o datetime pois iremos utilizar no exemplo.
+Abaixo uma explicação do código acima.
+
+Primeiro importamos o PyFixedFlatFile. Importamos também o datetime pois iremos utilizar no exemplo.
 ```python
 from pyFixedFlatFile import PyFixedFlatFile
 from datetime import datetime
 ```
 
-Então é instânciado o objeto responsável por criar a estrutura ou especificação.
+Então instânciamos o objeto responsável por criar a estrutura ou especificação.
 ```python
-builder = PyFixedFlatFile() 
+builder = PyFixedFlatFile() # a quebra de linha default será o '\n'
+
+# ou
+
+builder = PyFixedFlatFile(NL='dos') # a quebra de linha será '\r\n'
 ```
 
 E assim começamos a criar as nossas definições.
@@ -109,14 +121,14 @@ builder.id(2).\
 
 >o *.inscricaoEstadual(14, default='')*, indica que a inscrição estadual deve ter o tamanho 14 e é passado também o parâmetro nomeado default. Com ele podemos indicar um valor para quando esse atributo for passado uma string vazia.
 
-Existem três parâmetros nomeados que podemos passar:
-1. `default`, onde dizemos um valor padrão para aquele campo caso ele estja vazio (string vazia). 
+Existem 4 parâmetros nomeados que podemos passar:
+1. `default`, onde definimos um valor padrão para aquele campo caso ele esteja vazio (string vazia). 
 2. `fmt`, onde passamos uma função que deve ter sempre um único argumento. Esse argumento será o valor do próprio atributo. 
 3. `tp`, que é usado em conjunto com seu valor 'numeric', para indicar que o campo é numérico, pois por default os atributos serão tratados como strings.
 
-Na específicação é definido que tem um valor fixo para a posição após o nomeAdm quando o registro começar com o identificador '10'. Esse valor fixo é 2. Para esse tipo de situção foi criado o atributo constant, que na nossa construção fica contant('2').
+Na específicação é definido que tem um valor fixo para a posição após o nomeAdm quando o registro começar com o identificador '10'. Esse valor fixo é 2. Para esse tipo de situção foi criado o atributo constant, que na nossa construção fica constant('2').
 
-Com isso já sabemos tudo o que é necessário para definir a nossa especificação usando a biblioteca.
+Com isso já definimos a nossa especificação usando a biblioteca.
 Agora precisamos passar os dados para que ela trate e gere o que precisamos.
 Suponha que vamos buscar os dados em um banco de dados e montamos uma estruta como abaixo.
 ```python
@@ -163,9 +175,20 @@ for registro in registros:
 print(s)
 with open("fixed_flat_file.txt", "w") as f:
     f.write(s)
+
+# ou usar o método generate_all (recomendado)
+
+builder = get_builder()
+s = builder.generate_all(registros)
+print(s)
+with open("fixed_flat_file.txt", "w") as f:
+    f.write(s)
 ```
-O método generate irá retorna uma string formatada de acordo com a específicação representando um registro (uma linha) do arquivo.
-No exemplo, esse retorno é concatenado na variável s, que será salva em um arquivo .txt, que é o `fixed flat file`
+O método generate irá retorna uma string formatada de acordo com a específicação representando um registro (uma linha) do arquivo. No exemplo, esse retorno é concatenado na variável s, que será salva em um arquivo .txt, que é o `fixed flat file`. Com o método generate_all é retornado uma string com todo o conteúdo que deve ser salvo no arquivo .txt.
+
+Pronto, com o pyFixedFlatFile nós definimos uma especificação para os dados e também processamos os dados com base nessa 
+especificação para construir o nosso arquivo.
+
 
 Meta
 ----

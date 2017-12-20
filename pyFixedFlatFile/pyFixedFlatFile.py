@@ -24,16 +24,18 @@ class PyFixedFlatFile:
         size = spec['size']
 
         if ident == 'constant':
-            result = str(size) # o valor que está em size é o valor da constante     
+            # o valor que está em size é o valor da constante
+            result = str(size)
         else:
             if 'fmt' in spec:
                 resp = spec['fmt'](registro[ident])
             elif ident == 'id':
                 resp = registro[ident]
                 if len(resp) != size:
-                    raise Exception("The value of id parameter is not equal size! Id value: {}, size value {}. the size must be {}".format(resp, size, len(resp)))
+                    raise Exception("The value of id parameter is not equal size! Id value: {}, size value {}. the size must be {}".format(
+                        resp, size, len(resp)))
             elif ident == 'filler':
-                resp = ' ' # o campo será preenchido com espaços em branco
+                resp = ' '  # o campo será preenchido com espaços em branco
             else:
                 if ident in registro:
                     resp = registro[ident]
@@ -41,17 +43,19 @@ class PyFixedFlatFile:
                     if 'default' in spec:
                         resp = spec['default']
                     else:
-                        raise Exception("attribute {} not specified".format(ident))
-                            
+                        raise Exception(
+                            "attribute {} not specified".format(ident))
+
             if 'tp' in spec and spec['tp'] == 'numeric':
                 # Coloca zero(a) a esquerda
                 result = '{:0>{size}}'.format(int(resp), size=size)
             else:
                 # alinha os dados a esquerda e preenche com espaços em branco a direita
                 result = '{:<{size}}'.format(resp, size=size)
-            
+
             if len(result) != size:
-                    raise Exception("The length of value returned by function is not equal the size! Value return ed: {}, size value {}. the size must be {}".format(resp, size, len(resp)))
+                raise Exception("The length of value returned by function is not equal the size! Value return ed: {}, size value {}. the size must be {}".format(
+                    resp, size, len(resp)))
         return result
 
     def eq(self, id):
@@ -65,8 +69,8 @@ class PyFixedFlatFile:
             for spec in reg_spec:
                 s += self.fmt(spec, registro)
         else:
-            raise Exception("Id is not in attributes specification!") # melhorar essas mensagens em inglês
-        
+            raise Exception("Id is not in attributes specification!")
+
         return s
 
     def generate_all(self, registros):
@@ -88,6 +92,6 @@ class PyFixedFlatFile:
         def builder(size, **kwargs):
             keys = {'ident': class_name, **kwargs}
             self.spec.builder(size, **keys)
-            
-            return self 
+
+            return self
         return builder
