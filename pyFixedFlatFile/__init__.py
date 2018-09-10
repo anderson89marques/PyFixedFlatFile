@@ -1,3 +1,3 @@
 """PyFixedFlatFile"""
-__version__ = '0.9'
+__version__ = '1.0'
 from pyFixedFlatFile.pyFixedFlatFile import PyFixedFlatFile
