@@ -129,6 +129,8 @@ Existem 4 parâmetros nomeados que podemos passar:
 Na específicação é definido que tem um valor fixo para a posição após o nomeAdm quando o registro começar com o identificador '10'. Esse valor fixo é 2. Para esse tipo de situção foi criado o atributo constant, que na nossa construção fica constant('2').
 
 Com isso já definimos a nossa especificação usando a biblioteca.
+## Criando um flat file
+
 Agora precisamos passar os dados para que ela trate e gere o que precisamos.
 Suponha que vamos buscar os dados em um banco de dados e montamos uma estruta como abaixo.
 ```python
@@ -147,14 +149,8 @@ registros = [
 ```
 
 Os ids nos dicionários presentes na lista registros, não são ids objetos vindo dos bancos de dados e sim a indicação de qual bloco da especificação do PyFixedFlatFile vai tratar o dicionário específico.
-Assim o dicionário
-```python
-{
-        "id": "10", "cnpj": "00644422230", "inscricaoEstadual": "", "nomeAdm": "AnjosCompany",
-        "dataCriacao": datetime.now(),
-}
-```
-será tratado pelo bloco:
+Assim a lista acima será tratado pelo bloco:
+
 ```python
 builder.eq("10") 
 builder.id(2).\
@@ -163,22 +159,24 @@ builder.id(2).\
         nomeAdm(33).\
         constant('2').\
         dataCriacao(8, fmt=lambda d: format(d, '%d%m%Y'))
+# registros que começam com 11        
+builder.eq(11)
+builder.id(2).\
+        logradouro(34).\
+        numero(5, tp='numeric').\
+        bairro(15)
+# registros que começam com 90        
+builder.eq("90")
+builder.id(2).\
+        cnpj(14, fmt=lambda v: "{:>14}".format(v)).\
+        totalReg(12, tp='numeric').\
+        constant('99')
 ```
 Percebam que as chaves dos dicionários devem ser iguais ao que foi especificado, exceto pelo atributo `constant`, que não é passado pelo dicionário, pois o seu parâmetro ('2'), já é o seu valor.
 
 Abaixo como passar os dados para a biblioteca:
+
 ```python
-s = ""    
-for registro in registros:
-    print(registro)
-    s += builder.generate(registro) + "\n"
-print(s)
-with open("fixed_flat_file.txt", "w") as f:
-    f.write(s)
-
-# ou usar o método generate_all (recomendado)
-
-builder = get_builder()
 s = builder.generate_all(registros)
 print(s)
 with open("fixed_flat_file.txt", "w") as f:
@@ -189,6 +187,37 @@ O método generate irá retorna uma string formatada de acordo com a específica
 Pronto, com o pyFixedFlatFile nós definimos uma especificação para os dados e também processamos os dados com base nessa 
 especificação para construir o nosso arquivo.
 
+## Lendo um flat file
+Usando como exemplo o arquivo gerado no item anterior.
+
+```python
+builder_r = PyFixedFlatFile() # a quebra de linha default será o '\n'
+
+builder_r.eq("10") 
+builder_r.id(2).\
+        cnpj(14).\
+        inscricaoEstadual(14).\
+        nomeAdm(33).\
+        constant('2').\
+        dataCriacao(8, fmt=lambda d: datetime.strptime(d, '%d%m%Y'))
+
+# registros que começam com 11        
+builder_r.eq(11)
+builder_r.id(2).\
+        logradouro(34).\
+        numero(5, tp='numeric').\
+        bairro(15)
+# registros que começam com 90        
+builder_r.eq("90")
+builder_r.id(2).\
+        cnpj(14).\
+        totalReg(12, tp='numeric').\
+        constant('99')
+
+# Passando a path do arquivo a ser lido
+result = builder_r.read("fixed_flat_file.txt")
+print(result)
+```
 
 Meta
 ----
