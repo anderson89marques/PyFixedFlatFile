@@ -96,7 +96,6 @@ def test_format_method_with_fmt(setup_eq):
     with pytest.raises(Exception):
         assert setup_eq.fmt(spec, reg) == datetime.now().strftime('%d%m%Y')
 
-
 def test_multiplous_named_params():
     """default, fmt and tp must be combined?"""
     assert True

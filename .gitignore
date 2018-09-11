@@ -1,6 +1,7 @@
 .cache
 pyFixedFlatFile/__pycache__
 .pyFixedFlatFileEnv
+.pytest_cache
 .vscode
 .venv
 dist
