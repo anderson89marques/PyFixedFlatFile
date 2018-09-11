@@ -217,6 +217,11 @@ builder_r.id(2).\
 # Passando a path do arquivo a ser lido
 result = builder_r.read("fixed_flat_file.txt")
 print(result)
+
+# or
+
+# Criando .csv a partir do arquivo 
+builder_r.to_csv("fixed_flat_file.txt")
 ```
 
 Meta
