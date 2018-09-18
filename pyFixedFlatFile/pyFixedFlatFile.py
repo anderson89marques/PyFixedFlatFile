@@ -1,4 +1,5 @@
 """module to build fixed flat files"""
+import inspect
 from pyFixedFlatFile.specs import Spec
 
 
@@ -94,13 +95,13 @@ class PyFixedFlatFile:
                 position = 0
                 dict_line = {}
                 for spec in reg_spec:
-                    resp, pos = self.fmt_file(spec, line, position)
+                    resp, pos = self.fmt_file(spec, line, position, result)
                     dict_line.update(resp)
                     position = pos
                 result.append(dict_line)
         return result
 
-    def fmt_file(self, spec, line, position):
+    def fmt_file(self, spec, line, position, dict_line):
         ident = spec['ident']
         size = spec['size']
         if ident == 'constant':
@@ -108,10 +109,18 @@ class PyFixedFlatFile:
             size = len(size)
         end = position+size
         param = line[position:end].strip()
+        if 'fmt' in spec:
+            if len(inspect.signature(spec['fmt']).parameters) == 1:
+                param = spec['fmt'](param)
+            else:
+                param = spec['fmt'](param, dict_line)
+            
         if 'tp' in spec and spec['tp'] == 'numeric':
             param = int(param)
-        if 'fmt' in spec:
-            param = spec['fmt'](param)
+        
+        if 'tp' in spec and spec['tp'] == 'float':
+            param = float(param)
+
         result = {ident: param}
         return result, end
 

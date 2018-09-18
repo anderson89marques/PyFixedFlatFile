@@ -1,1 +1,1 @@
-from pyFixedFlatFile.cnabs.santander import Santander
+from pyFixedFlatFile.cnabs.itau import Itau

@@ -11,6 +11,18 @@ A biblioteca então facilita a criação desses arquivos do tipo `flat file`.
 pip install pyFixedFlatFile
 ```
 
+## Agora o pyfixedFlatFile possui o módulo cnabs
+
+No modulo cnabs tem(terá) como ler arquivos de extratos dos principais bancos.
+Por enquanto tem o módulo do banco itau. O próximo será Bradesco.
+
+```python
+from pyFixedFlatFile.cnabs import Itau
+
+result = Itau.read('Path_para_arquivo_extrato_itau')
+print(result)
+```
+
 ## Como usar?
 Como demonstração será usada uma especificação fictícia que definirá como o conteúdo do arquivo deve ser estruturado. 
 Após essa definição geraremos o um arquivo com dados também fictícios que obedecem a especificação..

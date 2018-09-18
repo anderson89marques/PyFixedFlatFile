@@ -25,7 +25,7 @@ class Spec:
             raise ParamsException(
                 "Size must be a int! Error in {} attribute.".format(kwargs['ident']))
 
-        if 'tp' in kwargs and kwargs['tp'] != 'numeric':
+        if 'tp' in kwargs and kwargs['tp'] not in ('numeric', 'float'):
             raise ParamsException(
                 "tp value must be only 'numeric'! Error in {} attribute.".format(kwargs['ident']))
 
