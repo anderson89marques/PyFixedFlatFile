@@ -1,5 +1,5 @@
 """
-ITAU
+BRADESCO
 EXTRATO DE CONTA CORRENTE
 Layout de Arquivos – CNAB240 – Versão 5.0
 """
@@ -7,9 +7,9 @@ from pyFixedFlatFile import PyFixedFlatFile
 from datetime import datetime
 
 
-class ItauFlatFile(PyFixedFlatFile):
+class BradescoFlatFile(PyFixedFlatFile):
     def __init__(self, *args, **kwargs):
-        super(ItauFlatFile, self).__init__(*args, **kwargs)
+        super(BradescoFlatFile, self).__init__(*args, **kwargs)
     
     def read(self, file_path):
         result = []
@@ -26,41 +26,39 @@ class ItauFlatFile(PyFixedFlatFile):
                 result.append(dict_line)
         return result
 
-Itau = ItauFlatFile()
+Bradesco = BradescoFlatFile()
 
 # REGISTRO HEADER DE ARQUIVO - TAMANHO DO REGISTRO = 240 Bytes
-Itau.eq('0')
-(Itau
+Bradesco.eq('0')
+(Bradesco
     .codigo_banco(3, tp='numeric')
     .codigo_lote(4, tp='numeric')
     .tipo_registro(1)
     .vazio1(9)
     .tipo_inscricao(1)
     .numero_inscricao(14, tp='numeric')
-    .vazio2(15)
-    .codigo_convenio(5)
-    .zeros1(1, tp='numeric')
-    .codigo_agencia(4, tp='numeric')
+    .codigo_convenio(20)
+    .codigo_agencia(5, tp='numeric')
     .digito_verificador_agencia(1)
-    .zeros(7, tp='numeric')
-    .numero_conta(5, tp='numeric')
-    .vazio3(1)
+    .numero_conta(12, tp='numeric')
+    .digito_verificador_conta(1)
     .digito_verificador_conta_agencia(1)
     .nome_empresa(30)
     .nome_banco(30)
-    .vazio4(10)
+    .vazio2(10)
     .codigo_retorno(1)
     .data_geracao_arquivo(8, fmt=lambda d: datetime.strptime(d, '%d%m%Y'))
     .hora_geracao_arquivo(6, fmt=lambda date, data:  datetime.strptime(data['data_geracao_arquivo'].strftime('%d%m%Y') + ' ' + date , '%d%m%Y %H%M%S'))
     .sequencia(6, tp='numeric')
     .layout(3)
-    .zeros2(5, tp='numeric')
-    .reservado(5)
-    .vazio5(49))
+    .densidade(5)
+    .reservado_banco(20)
+    .reservado_empresa(20)
+    .vazio3(29))
 
 # REGISTRO HEADER LOTE - TAMANHO DO REGISTRO = 240 Bytes
-Itau.eq('1')
-(Itau
+Bradesco.eq('1')
+(Bradesco
     .codigo_banco(3, tp='numeric')
     .codigo_lote(4, tp='numeric')
     .tipo_registro(1)
@@ -71,85 +69,70 @@ Itau.eq('1')
     .vazio1(1)
     .tipo_inscricao(1)
     .numero_inscricao(14, tp='numeric')
-    .tipo_conta(4)
-    .vazio2(11)
-    .codigo_convenio(5)
-    .zeros1(1, tp='numeric')
-    .codigo_agencia(4, tp='numeric')
+    .codigo_convenio(20)
+    .codigo_agencia(5, tp='numeric')
     .digito_verificador_agencia(1)
-    .zeros(7, tp='numeric')
-    .numero_conta(5, tp='numeric')
-    .vazio3(1)
+    .numero_conta(12, tp='numeric')
+    .digito_verificador_conta(1)
     .digito_verificador_conta_agencia(1)
     .nome_empresa(30)
-    .vazio4(40)
+    .vazio2(40)
     .data_inicial(8, fmt=lambda d: datetime.strptime(d, '%d%m%Y'))
     .valor_inicial(18, fmt=lambda value: value[:16] + '.' + value[16:] , tp='float')
     .situacao_inicial(1)
     .status_inicial(1)
     .tipo_moeda(3)
     .sequencia_extrato(5, tp='numeric')
-    .vazio5(62))
+    .vazio3(62))
 
-# REGISTRO SEGMENTO E - TAMANHO DO REGISTRO = 240 Bytes
-Itau.eq('3')
-(Itau
+## REGISTRO SEGMENTO E - TAMANHO DO REGISTRO = 240 Bytes
+Bradesco.eq('3')
+(Bradesco
     .codigo_banco(3, tp='numeric')
     .codigo_lote(4, tp='numeric')
     .tipo_registro(1)
     .numero_registro(5, tp='numeric')    
     .segmento(1)
-    .lancamento(1, tp='numeric')
-    .vazio1(2)
+    .vazio1(3)
     .tipo_inscricao(1)
     .numero_inscricao(14, tp='numeric')
-    .vazio2(15)
-    .codigo_convenio(5)
-    .zeros1(1, tp='numeric')
-    .codigo_agencia(4, tp='numeric')
+    .codigo_convenio(20)
+    .codigo_agencia(5, tp='numeric')
     .digito_verificador_agencia(1)
-    .zeros(7, tp='numeric')
-    .numero_conta(5, tp='numeric')
-    .vazio3(1)
+    .numero_conta(12, tp='numeric')
+    .digito_verificador_conta(1)
     .digito_verificador_conta_agencia(1)
     .nome_empresa(30)
-    .reservado(6)
+    .vazio2(6)
     .natureza(3)
     .tipo_complemento(2, tp='numeric')
-    .banco_origem(3, tp='numeric')
-    .agencia_origem(5, tp='numeric')
-    .agencia_conta_origem(12, tp='numeric')
+    .complemento(20)
     .cpmf(1)
     .data_contabil(8, fmt=lambda d: datetime.strptime(d, '%d%m%Y') if d else '')
     .data_lancamento(8, fmt=lambda d: datetime.strptime(d, '%d%m%Y') if d else '')
     .valor_lancamento(18, fmt=lambda value: value[:16] + '.' + value[16:], tp='float')
-    .lancamento(1)
+    .tipo_lancamento(1)
     .categoria(3, tp='numeric')
-    .codigo_lancamento(4)
+    .codigo_historico(4)
     .historico(25)
-    .vazio4(33)
-    .numero_documento(6))
+    .numero_documento(39))
 
-
-# REGISTRO TRAILER DE LOTE - TAMANHO DO REGISTRO = 240 Bytes
-Itau.eq('5')
-(Itau
+## REGISTRO TRAILER DE LOTE - TAMANHO DO REGISTRO = 240 Bytes
+Bradesco.eq('5')
+(Bradesco
     .codigo_banco(3, tp='numeric')
     .codigo_lote(4, tp='numeric')
     .tipo_registro(1)
     .vazio1(9)
     .tipo_inscricao(1)
     .numero_inscricao(14, tp='numeric')
-    .vazio2(15)
-    .codigo_convenio(5)
-    .zeros1(1, tp='numeric')
-    .codigo_agencia(4, tp='numeric')
+    .codigo_convenio(20)
+    .codigo_agencia(5, tp='numeric')
     .digito_verificador_agencia(1)
-    .zeros(7, tp='numeric')
-    .numero_conta(5, tp='numeric')
-    .vazio3(1)
+    .numero_conta(12, tp='numeric')
+    .digito_verificador_conta(1)
     .digito_verificador_conta_agencia(1)
-    .vazio4(16)
+    .vazio2(16)
     .bloqueado(18, fmt=lambda value: value[:16] + '.' + value[16:], tp='float')
     .limite(18, fmt=lambda value: value[:16] + '.' + value[16:], tp='float')
     .saldo_bloqueado(18, fmt=lambda value: value[:16] + '.' + value[16:], tp='float')
@@ -160,12 +143,11 @@ Itau.eq('5')
     .total_registros(6, tp='numeric')
     .total_valor_debito(18, fmt=lambda value: value[:16] + '.' + value[16:], tp='float')
     .total_valor_credito(18, fmt=lambda value: value[:16] + '.' + value[16:], tp='float')
-    .totais_valores_nao_contabeis(18, fmt=lambda value: value[:16] + '.' + value[16:], tp='float')
-    .vazio5(10))
+    .vazio5(28))
 
-# REGISTRO TRAILER DE ARQUIVO - TAMANHO DO REGISTRO = 240 Bytes
-Itau.eq('9')
-(Itau
+## REGISTRO TRAILER DE ARQUIVO - TAMANHO DO REGISTRO = 240 Bytes
+Bradesco.eq('9')
+(Bradesco
     .codigo_banco(3, tp='numeric')
     .codigo_lote(4)
     .tipo_registro(1)
