@@ -80,7 +80,7 @@ class PyFixedFlatFile:
             s += row_str
 
         return s
-    
+
     def read(self, file_path):
         result = []
         with open(file_path, 'r') as file_:
@@ -88,7 +88,7 @@ class PyFixedFlatFile:
                 # get the size of the identifier  in self.data
                 # This size will be used to get the identifier in line string
                 line_id_size = len(list(self.data.keys())[0])
-        
+
                 line_id = line[:line_id_size]
                 reg_spec = self.data[line_id]
                 position = 0
@@ -99,7 +99,7 @@ class PyFixedFlatFile:
                     position = pos
                 result.append(dict_line)
         return result
-    
+
     def fmt_file(self, spec, line, position):
         ident = spec['ident']
         size = spec['size']
@@ -115,6 +115,14 @@ class PyFixedFlatFile:
         result = {ident: param}
         return result, end
 
+    def to_csv(self, file_to_read, csv_file_name='csv_file'):
+        result = self.read(file_to_read)
+        import csv
+
+        with open('{}.csv'.format(csv_file_name), 'w', newline='') as csvfile:
+            for row in result:
+                writer = csv.DictWriter(csvfile, fieldnames=row.keys())
+                writer.writerow(row)
 
     def __getattr__(self, class_name):
         """implementation of builder pattern that turn possible write code like this:
@@ -127,7 +135,6 @@ class PyFixedFlatFile:
         def builder(size, **kwargs):
             keys = {'ident': class_name, **kwargs}
             self.spec.builder(size, **keys)
-            #print(keys)
 
             return self
         return builder
