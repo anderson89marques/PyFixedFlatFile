@@ -124,7 +124,7 @@ Itau.eq('3')
     .data_lancamento(8, fmt=lambda d: datetime.strptime(d, '%d%m%Y') if d else '')
     .valor_lancamento(18, fmt=lambda value: value[:16] + '.' + value[16:], tp='float')
     .lancamento(1)
-    .categoria(3, tp='numeric')
+    .categoria(3)
     .codigo_lancamento(4)
     .historico(25)
     .vazio4(33)
@@ -163,7 +163,7 @@ Itau.eq('5')
     .totais_valores_nao_contabeis(18, fmt=lambda value: value[:16] + '.' + value[16:], tp='float')
     .vazio5(10))
 
-# REGISTRO TRAILER DE ARQUIVO - TAMANHO DO REGISTRO = 240 Bytes
+#REGISTRO TRAILER DE ARQUIVO - TAMANHO DO REGISTRO = 240 Bytes
 Itau.eq('9')
 (Itau
     .codigo_banco(3, tp='numeric')
