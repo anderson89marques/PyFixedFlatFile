@@ -1,30 +1,11 @@
 """
 Layout Santander 240 posições versão 8.2 com complemento
 """
-from pyFixedFlatFile import PyFixedFlatFile
 from datetime import datetime
 
+from pyFixedFlatFile.cnabs.base import CNAB240
 
-class SantanderFlatFile(PyFixedFlatFile):
-    def __init__(self, *args, **kwargs):
-        super(SantanderFlatFile, self).__init__(*args, **kwargs)
-    
-    def read(self, file_path):
-        result = []
-        with open(file_path, 'r') as file_:
-            for line in file_:
-                line_id = line[7]
-                reg_spec = self.data[line_id]
-                position = 0
-                dict_line = {}
-                for spec in reg_spec:
-                    resp, pos = self.process_column(spec, line, position, dict_line)
-                    dict_line.update(resp)
-                    position = pos
-                result.append(dict_line)
-        return result
-
-Santander = SantanderFlatFile()
+Santander = CNAB240(start=8, stop=9)
 
 # REGISTRO HEADER DE ARQUIVO - TAMANHO DO REGISTRO = 240 Bytes
 Santander.eq('0')
@@ -46,7 +27,7 @@ Santander.eq('0')
     .vazio2(10)
     .codigo_retorno(1)
     .data_geracao_arquivo(8, fmt=lambda d: datetime.strptime(d, '%d%m%Y'))
-    .hora_arquivo(6, fmt=lambda date, data:  datetime.strptime(data['data_geracao_arquivo'].strftime('%d%m%Y') + ' ' + date , '%d%m%Y %H%M%S'))
+    .hora_arquivo(6, fmt=lambda date, data:  datetime.strptime(data['data_geracao_arquivo'].strftime('%d%m%Y') + ' ' + date, '%d%m%Y %H%M%S'))
     .arquivo_sequencia(5)
     .layout(3)
     .densidade_gravacao(5)
@@ -88,7 +69,7 @@ Santander.eq('3')
     .codigo_banco(3, tp='numeric')
     .codigo_lote(4, tp='numeric')
     .tipo_registro(1)
-    .numero_registro(5, tp='numeric')    
+    .numero_registro(5, tp='numeric')
     .segmento(1)
     .vazio1(3)
     .tipo_inscricao(1)

@@ -3,30 +3,11 @@ BRADESCO
 EXTRATO DE CONTA CORRENTE
 Layout de Arquivos – CNAB240 – Versão 5.0
 """
-from pyFixedFlatFile import PyFixedFlatFile
 from datetime import datetime
 
+from pyFixedFlatFile.cnabs.base import CNAB240
 
-class BradescoFlatFile(PyFixedFlatFile):
-    def __init__(self, *args, **kwargs):
-        super(BradescoFlatFile, self).__init__(*args, **kwargs)
-    
-    def read(self, file_path):
-        result = []
-        with open(file_path, 'r') as file_:
-            for line in file_:
-                line_id = line[7]
-                reg_spec = self.data[line_id]
-                position = 0
-                dict_line = {}
-                for spec in reg_spec:
-                    resp, pos = self.process_column(spec, line, position, dict_line)
-                    dict_line.update(resp)
-                    position = pos
-                result.append(dict_line)
-        return result
-
-Bradesco = BradescoFlatFile()
+Bradesco = CNAB240(start=8, stop=9)
 
 # REGISTRO HEADER DE ARQUIVO - TAMANHO DO REGISTRO = 240 Bytes
 Bradesco.eq('0')
@@ -48,7 +29,7 @@ Bradesco.eq('0')
     .vazio2(10)
     .codigo_retorno(1)
     .data_geracao_arquivo(8, fmt=lambda d: datetime.strptime(d, '%d%m%Y'))
-    .hora_geracao_arquivo(6, fmt=lambda date, data:  datetime.strptime(data['data_geracao_arquivo'].strftime('%d%m%Y') + ' ' + date , '%d%m%Y %H%M%S'))
+    .hora_geracao_arquivo(6, fmt=lambda date, data:  datetime.strptime(data['data_geracao_arquivo'].strftime('%d%m%Y') + ' ' + date, '%d%m%Y %H%M%S'))
     .sequencia(6, tp='numeric')
     .layout(3)
     .densidade(5)
@@ -78,7 +59,7 @@ Bradesco.eq('1')
     .nome_empresa(30)
     .vazio2(40)
     .data_inicial(8, fmt=lambda d: datetime.strptime(d, '%d%m%Y'))
-    .valor_inicial(18, fmt=lambda value: value[:16] + '.' + value[16:] , tp='float')
+    .valor_inicial(18, fmt=lambda value: value[:16] + '.' + value[16:], tp='float')
     .situacao_inicial(1)
     .status_inicial(1)
     .tipo_moeda(3)
@@ -91,7 +72,7 @@ Bradesco.eq('3')
     .codigo_banco(3, tp='numeric')
     .codigo_lote(4, tp='numeric')
     .tipo_registro(1)
-    .numero_registro(5, tp='numeric')    
+    .numero_registro(5, tp='numeric')
     .segmento(1)
     .vazio1(3)
     .tipo_inscricao(1)

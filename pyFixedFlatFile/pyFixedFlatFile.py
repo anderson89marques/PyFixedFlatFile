@@ -1,62 +1,72 @@
 """module to build fixed flat files"""
 import inspect
 from collections import defaultdict
-from pyFixedFlatFile.exceptions import ParamsException
+
+from pyFixedFlatFile.exceptions import LineIdentifierException, ParamsException
 
 
 class PyFixedFlatFile:
-    """implements the logics to build the flat files"""
+    """Implements the logic to build a flat file"""
 
     def __init__(self, *args, **kwargs):
-        self.current_id = None  # identifier of the line
-        self.data = defaultdict(list) # contains the steps from builder definition
+        # contains the steps from builder definition
+        self.data = defaultdict(list)
         self.nl = '\r\n' if kwargs.get('NL') == 'dos' else '\n'
-    
+
+        # File specification don't initialize a line indexed by zero
+        self.position = slice(kwargs.get('start')-1, kwargs.get('stop') -
+                              1) if kwargs.get('start') and kwargs.get('start') else slice(0, 1)
+
+        self.__current_id = None  # identifier of the line
+        self.__start_column = 0
+
     def eq(self, id):
         """Set line ident"""
-        self.current_id = str(id)
+        self.__current_id = str(id)
+        self.__start_column = 0
 
     def read(self, file_path):
         result = []
         with open(file_path, 'r') as file_:
             for line in file_:
-                # get the size of the identifier in self.data
-                # This size will be used to get the identifier in line string
-                line_id_size = len(list(self.data.keys())[0])
-
-                line_id = line[:line_id_size]
-                reg_spec = self.data[line_id]
-                position = 0
-                dict_line = {}
-                for spec in reg_spec:
-                    resp, pos = self.process_column(spec, line, position, result)
-                    dict_line.update(resp)
-                    position = pos
-                result.append(dict_line)
+                result.append(self.process_line(line))
         return result
 
-    def process_column(self, spec, line, position, dict_line):
+    def process_line(self, line):
+        line_id = line[self.position]
+        if line_id not in list(self.data.keys()):
+            raise LineIdentifierException(
+                f"Line identifier not in specification: {self.data.keys()}")
+
+        reg_spec = self.data[line_id]
+        line_dict = {}
+        for spec in reg_spec:
+            resp = self.process_column(spec, line, line_dict)
+            line_dict.update(resp)
+
+        return line_dict
+
+    def process_column(self, spec, line, line_dict):
         ident = spec['ident']
         size = spec['size']
         if ident == 'constant':
             size = len(size)
 
-        end = position+size
-        param = line[position:end].strip()
+        param = line[spec['slice']].strip()
         if 'fmt' in spec:
             if len(inspect.signature(spec['fmt']).parameters) == 1:
                 param = spec['fmt'](param)
             else:
-                param = spec['fmt'](param, dict_line)
-            
+                param = spec['fmt'](param, line_dict)
+
         if 'tp' in spec and spec['tp'] == 'numeric':
             param = int(param)
-        
+
         if 'tp' in spec and spec['tp'] == 'float':
             param = float(param)
 
         result = {ident: param}
-        return result, end
+        return result
 
     def fmt(self, spec, registro):
         result = ""
@@ -75,7 +85,7 @@ class PyFixedFlatFile:
                     raise Exception("The value of id parameter is not equal size! Id value: {}, size value {}. the size must be {}".format(
                         resp, size, len(resp)))
             elif ident == 'filler':
-                resp = ' '  #   o campo será preenchido com espaços em branco
+                resp = ' '
             else:
                 if ident in registro:
                     resp = registro[ident]
@@ -87,10 +97,9 @@ class PyFixedFlatFile:
                             "attribute {} not specified".format(ident))
 
             if 'tp' in spec and spec['tp'] == 'numeric':
-                # Coloca zero(a) a esquerda
+                # Put zeros in string's left
                 result = '{:0>{size}}'.format(int(resp), size=size)
             else:
-                # alinha os dados a esquerda e preenche com espaços em branco a direita
                 result = '{:<{size}}'.format(resp, size=size)
 
             if len(result) != size:
@@ -122,6 +131,10 @@ class PyFixedFlatFile:
         This dict will be used for generate method from PyFixedFlatFile generate linha of the flat file.
         """
 
+        if not self.__current_id:
+            raise Exception(
+                "Id of line not especified: You must use 'eq' method of PyFixedFlatFile!")
+
         if kwargs['ident'] != 'constant' and not isinstance(size, int):
             raise ParamsException(
                 "Size must be a int! Error in {} attribute.".format(kwargs['ident']))
@@ -136,16 +149,15 @@ class PyFixedFlatFile:
 
         try:
              kwargs['size'] = int(
-                size) if kwargs['ident'] != 'constant' else size
+                 size) if kwargs['ident'] != 'constant' else size
         except Exception as e:
             raise Exception(
                 "size attribute must be int but its value has type {}".format(type(size)))
 
-        if not self.current_id:
-            raise Exception(
-                "Id of line not especified: You must use 'eq' method of PyFixedFlatFile!")
-
-        self.data[self.current_id].append(kwargs)
+        kwargs['slice'] = slice(self.__start_column,
+                                self.__start_column+kwargs['size'])
+        self.__start_column += kwargs['size']
+        self.data[self.__current_id].append(kwargs)
 
     def __getattr__(self, class_name):
         """implementation of builder pattern that turn possible write code like this:
@@ -161,7 +173,7 @@ class PyFixedFlatFile:
 
             return self
         return builder
-    
+
     def to_csv(self, file_to_read, csv_file_name='csv_file'):
         result = self.read(file_to_read)
         import csv
