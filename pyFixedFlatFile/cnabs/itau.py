@@ -20,7 +20,7 @@ class ItauFlatFile(PyFixedFlatFile):
                 position = 0
                 dict_line = {}
                 for spec in reg_spec:
-                    resp, pos = self.fmt_file(spec, line, position, dict_line)
+                    resp, pos = self.process_column(spec, line, position, dict_line)
                     dict_line.update(resp)
                     position = pos
                 result.append(dict_line)
