@@ -7,12 +7,12 @@ class CNAB240(PyFixedFlatFile):
     def __init__(self, *args, **kwargs):
         super(CNAB240, self).__init__(*args, **kwargs)
 
-    def read(self, file_path):
+    def _read(self, file_path, process_line):
         result = []
         with open(file_path, 'r') as file_:
             for line in file_:
                 if len(line) > 241:
                     raise LineSizeException(
                         "Line has its size bigger than 240!!")
-                result.append(self.process_line(line))
+                result.append(self._process_line(line, process_line))
         return result
