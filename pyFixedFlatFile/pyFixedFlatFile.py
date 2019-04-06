@@ -1,5 +1,6 @@
 """module to build fixed flat files"""
 import inspect
+import math
 from collections import defaultdict
 
 from pyFixedFlatFile.exceptions import LineIdentifierException, ParamsException
@@ -9,7 +10,14 @@ class PyFixedFlatFile:
     """Implements the logic to build a flat file"""
 
     def __init__(self, *args, **kwargs):
-        # contains the steps from builder definition
+        """
+        Parameters:
+            NL (str): line break
+            start (int): start position of the line identifier
+            stop (int): stop position of the line identifier
+            identifier_name (str): This is MANDATORY to write the flat file. 
+        """
+
         self.data = defaultdict(list)
         self.nl = '\r\n' if kwargs.get('NL') == 'dos' else '\n'
 
@@ -19,9 +27,12 @@ class PyFixedFlatFile:
 
         self.__current_id = None  # identifier of the line
         self.__start_column = 0
+        self.identifier_name = kwargs.get('identifier_name', None)
+
 
     def eq(self, id):
         """Set line ident"""
+
         self.__current_id = str(id)
         self.__start_column = 0
 
@@ -53,17 +64,17 @@ class PyFixedFlatFile:
             size = len(size)
 
         param = line[spec['slice']].strip()
-        if 'fmt' in spec:
-            if len(inspect.signature(spec['fmt']).parameters) == 1:
-                param = spec['fmt'](param)
+        if 'fmt_r' in spec:
+            if len(inspect.signature(spec['fmt_r']).parameters) == 1:
+                param = spec['fmt_r'](param)
             else:
-                param = spec['fmt'](param, line_dict)
+                param = spec['fmt_r'](param, line_dict)
 
-        if 'tp' in spec and spec['tp'] == 'numeric':
-            param = int(param)
+        if 'tp' in spec:
+            param = spec['tp'](param)
 
-        if 'tp' in spec and spec['tp'] == 'float':
-            param = float(param)
+        # if 'tp' in spec and spec['tp'] == 'float':
+        #     param = float(param)
 
         result = {ident: param}
         return result
@@ -77,13 +88,8 @@ class PyFixedFlatFile:
             # the size will be used as constant value
             result = str(size)
         else:
-            if 'fmt' in spec:
-                resp = spec['fmt'](registro[ident])
-            elif ident == 'id':
-                resp = registro[ident]
-                if len(resp) != size:
-                    raise Exception("The value of id parameter is not equal size! Id value: {}, size value {}. the size must be {}".format(
-                        resp, size, len(resp)))
+            if 'fmt_w' in spec:
+                resp = spec['fmt_w'](registro[ident])
             elif ident == 'filler':
                 resp = ' '
             else:
@@ -96,8 +102,9 @@ class PyFixedFlatFile:
                         raise Exception(
                             "attribute {} not specified".format(ident))
 
-            if 'tp' in spec and spec['tp'] == 'numeric':
+            if 'tp' in spec:
                 # Put zeros in string's left
+                resp = ('{0:.2f}'.format(resp)).replace('.', '') if isinstance(resp, float) else resp
                 result = '{:0>{size}}'.format(int(resp), size=size)
             else:
                 result = '{:<{size}}'.format(resp, size=size)
@@ -109,8 +116,8 @@ class PyFixedFlatFile:
 
     def generate(self, registro):
         s = ""
-        if 'id' in registro and registro['id'] in self.data:
-            reg_spec = self.data[registro['id']]
+        if self.identifier_name in registro and self.data.get(registro[self.identifier_name], None):
+            reg_spec = self.data[registro[self.identifier_name]]
             for spec in reg_spec:
                 s += self.fmt(spec, registro)
         else:
@@ -139,7 +146,7 @@ class PyFixedFlatFile:
             raise ParamsException(
                 "Size must be a int! Error in {} attribute.".format(kwargs['ident']))
 
-        if 'tp' in kwargs and kwargs['tp'] not in ('numeric', 'float'):
+        if ('tp' in kwargs) and (not any((kwargs['tp'] is int, kwargs['tp'] is float))):
             raise ParamsException(
                 "tp value must be only 'numeric'! Error in {} attribute.".format(kwargs['ident']))
 
@@ -163,10 +170,10 @@ class PyFixedFlatFile:
         """implementation of builder pattern that turn possible write code like this:
         builder = PyFixedFlatFile()
         builder.eq("10") 
-        builder.id(2).\
         cnpj(14, fmt=lambda v: "{:>14}".format(v)).\
         inscricaoEstadual(14, default='').\
         """
+
         def builder(size, **kwargs):
             kwargs.update({'ident': class_name})
             self.builder_data(size, **kwargs)
